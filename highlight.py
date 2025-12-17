@@ -5,6 +5,19 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+def parse_time_to_seconds(time_str):
+    """
+    Accepts:
+    - "45"
+    - "1:15"
+    Returns total seconds as int
+    """
+    if ":" in time_str:
+        minutes, seconds = time_str.split(":")
+        return int(minutes) * 60 + int(seconds)
+    else:
+        return int(time_str)
+    
 ACCESS_TOKEN = os.getenv("ACCESS_TOKEN")
 
 if not ACCESS_TOKEN:
@@ -15,9 +28,17 @@ headers = {
     "Authorization": f"Bearer {ACCESS_TOKEN}"
 }
 
-# CONFIG (will make this user input later) 
-START_SECONDS = 45      # where highlight starts
-HIGHLIGHT_DURATION = 30  # how long to play (seconds)
+
+start_input = input("Enter highlight start time (seconds or mm:ss): ")
+duration_input = input("Enter highlight duration (seconds): ")
+
+START_SECONDS = parse_time_to_seconds(start_input)
+HIGHLIGHT_DURATION = int(duration_input)
+
+if START_SECONDS < 0 or HIGHLIGHT_DURATION <= 0:
+    print("Invalid input values.")
+    exit(1)
+
 
 # 1. Seek to start
 seek_ms = START_SECONDS * 1000
