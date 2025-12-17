@@ -19,3 +19,7 @@ class SpotifyClient:
     def next_track(self):
         url = f"{BASE_URL}/me/player/next"
         return requests.post(url, headers=self.headers)
+    
+    def play(self):
+        url = f"{BASE_URL}/me/player/play"
+        return requests.put(url, headers=self.headers)
