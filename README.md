@@ -1,4 +1,4 @@
-# Spotify Highlight Player 🎧
+# Spotify Highlight Player 
 
 A Python-based tool that plays only the most important highlight segments of Spotify songs instead of full tracks.
 
