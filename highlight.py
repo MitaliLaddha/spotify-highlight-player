@@ -18,7 +18,10 @@ def parse_time_to_seconds(time_str):
     else:
         return int(time_str)
     
-ACCESS_TOKEN = os.getenv("ACCESS_TOKEN")
+from spotify_auth import get_access_token
+
+ACCESS_TOKEN = get_access_token()
+
 
 if not ACCESS_TOKEN:
     print("ERROR: ACCESS_TOKEN missing")
