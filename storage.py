@@ -13,3 +13,10 @@ def load_highlights():
 def save_highlights(highlights):
     with open(HIGHLIGHTS_FILE, "w") as f:
         json.dump(highlights, f, indent=2)
+
+def delete_highlight(highlights, track_id):
+    if track_id in highlights:
+        del highlights[track_id]
+        save_highlights(highlights)
+        return True
+    return False

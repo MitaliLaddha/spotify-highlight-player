@@ -37,9 +37,51 @@ def main():
     highlights = load_highlights()
 
     if track_id in highlights:
-        start_seconds = highlights[track_id]["start"]
-        duration_seconds = highlights[track_id]["duration"]
-        print("Using saved highlight")
+        saved = highlights[track_id]
+        print("Saved highlight found")
+        print(f"Start: {saved['start']}s, Duration: {saved['duration']}s")
+
+        print("\nChoose an option:")
+        print("1. Play saved highlight")
+        print("2. Edit highlight")
+        print("3. Delete highlight")
+        print("4. Skip song")
+
+        choice = input("Enter choice (1-4): ").strip()
+
+        if choice == "1":
+            start_seconds = saved["start"]
+            duration_seconds = saved["duration"]
+
+        elif choice == "2":
+            start_input = input("Enter new start time (seconds or mm:ss): ")
+            duration_input = input("Enter new duration (seconds): ")
+
+            start_seconds = parse_time_to_seconds(start_input)
+            duration_seconds = int(duration_input)
+
+            highlights[track_id] = {
+                "start": start_seconds,
+                "duration": duration_seconds
+            }
+            save_highlights(highlights)
+            print("Highlight updated ")
+
+        elif choice == "3":
+            del highlights[track_id]
+            save_highlights(highlights)
+            print("Highlight deleted")
+            spotify.next_track()
+            return
+
+        elif choice == "4":
+            spotify.next_track()
+            return
+
+        else:
+            print("Invalid choice.")
+            return
+
     else:
         print("No highlight saved for this song.")
         start_input = input("Enter highlight start time (seconds or mm:ss): ")
