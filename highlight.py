@@ -2,7 +2,7 @@ import time
 from spotify_auth import get_access_token
 from spotify_client import SpotifyClient
 from utils import parse_time_to_seconds
-from storage import load_highlights, save_highlights
+from storage import get_highlight, save_highlight, delete_highlight
 
 def main():
     access_token = get_access_token()
@@ -20,9 +20,8 @@ def main():
         print("No active playback even after resume.")
         return
 
-
     data = playback_response.json()
-    track = data["item"]
+    track = data.get("item")
 
     if not track:
         print("No track playing.")
@@ -34,11 +33,11 @@ def main():
 
     print(f"Now playing: {track_name} — {artists}")
 
-    highlights = load_highlights()
+    # Ask SQLite database for this specific track's highlight
+    saved = get_highlight(track_id)
 
-    if track_id in highlights:
-        saved = highlights[track_id]
-        print("Saved highlight found")
+    if saved:
+        print("Saved highlight found in database")
         print(f"Start: {saved['start']}s, Duration: {saved['duration']}s")
 
         print("\nChoose an option:")
@@ -59,18 +58,13 @@ def main():
 
             start_seconds = parse_time_to_seconds(start_input)
             duration_seconds = int(duration_input)
-
-            highlights[track_id] = {
-                "start": start_seconds,
-                "duration": duration_seconds
-            }
-            save_highlights(highlights)
-            print("Highlight updated ")
+            
+            save_highlight(track_id, start_seconds, duration_seconds)
+            print("Highlight updated in database.")
 
         elif choice == "3":
-            del highlights[track_id]
-            save_highlights(highlights)
-            print("Highlight deleted")
+            delete_highlight(track_id)
+            print("Highlight deleted from database.")
             spotify.next_track()
             return
 
@@ -90,12 +84,8 @@ def main():
         start_seconds = parse_time_to_seconds(start_input)
         duration_seconds = int(duration_input)
 
-        highlights[track_id] = {
-            "start": start_seconds,
-            "duration": duration_seconds
-        }
-        save_highlights(highlights)
-        print("Highlight saved ")
+        save_highlight(track_id, start_seconds, duration_seconds)
+        print("Highlight saved to database.")
 
     # Apply highlight
     seek_resp = spotify.seek(start_seconds * 1000)
@@ -106,8 +96,7 @@ def main():
     time.sleep(duration_seconds)
     next_resp = spotify.next_track()
     print("Next status:", next_resp.status_code)
-
-    print("Skipped to next song..")
+    print("Skipped to next song.")
 
 if __name__ == "__main__":
     main()
